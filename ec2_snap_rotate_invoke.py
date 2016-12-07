@@ -29,4 +29,4 @@ def ec2_snap_rotate_invoke(event, context):
     for snap in snapshot_response['Snapshots']:
         # call lambda function tu execute the specific instance task
         context = json.dumps({'snapshot_id': snap['SnapshotId']})
-        cli_lambda.invoke(FunctionName='ec2_snap_rotate_exec', InvocationType='Event', Payload=context)
+        cli_lambda.invoke(FunctionName='ec2_snap_rotate_exec.py', InvocationType='Event', Payload=context)

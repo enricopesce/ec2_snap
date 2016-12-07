@@ -23,7 +23,7 @@ def ec2_snap_invoke(event, context):
         context = json.dumps({'instance_id': instance['InstanceId'],
                               'retention': retention_days,
                               'mode': 'hot'})
-        cli_lambda.invoke(FunctionName='ec2_snap_exec', InvocationType='Event', Payload=context)
+        cli_lambda.invoke(FunctionName='ec2_snap_exec.py', InvocationType='Event', Payload=context)
 
     filters = [{'Name': 'tag:Backup', 'Values': ['REBOOT']}]
 
@@ -36,4 +36,4 @@ def ec2_snap_invoke(event, context):
         context = json.dumps({'instance_id': instance['InstanceId'],
                               'retention': retention_days,
                               'mode': 'cold'})
-        cli_lambda.invoke(FunctionName='ec2_snap_exec', InvocationType='Event', Payload=context)
+        cli_lambda.invoke(FunctionName='ec2_snap_exec.py', InvocationType='Event', Payload=context)
