@@ -2,27 +2,28 @@ import logging
 import boto3
 import datetime
 
-
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 simulate = False
 
 
 def get_instance_tag(id, tag_name):
     res_ec2 = boto3.resource('ec2')
     tags = res_ec2.Instance(id).tags
-    for tag in tags:
-        if tag['Key'] == tag_name:
-            return tag['Value']
+    if tags is not None:
+        for tag in tags:
+            if tag['Key'] == tag_name:
+                return tag['Value']
     return id
 
 
 def get_volume_tag(id, tag_name):
     res_ec2 = boto3.resource('ec2')
     tags = res_ec2.Volume(id).tags
-    for tag in tags:
-        if tag['Key'] == tag_name:
-            return tag['Value']
+    if tags is not None:
+        for tag in tags:
+            if tag['Key'] == tag_name:
+                return tag['Value']
     return id
 
 
@@ -64,15 +65,14 @@ def snapshots_by_instance(instance, delete_date, mode):
             res_instance.start(DryRun=simulate)
     except Exception as e:
         logging.error("Unexpected error: %s" % e)
-        #se spenta la instance va riaccesa
     return
 
 
 #lambda call
 def ec2_snap_exec(event, context):
     try:
-        instance = boto3.resource('ec2').Instance(event['instance_id'])
         days = int(event['retention'])
+        instance = boto3.resource('ec2').Instance(event['instance_id'])
         delete_date = datetime.date.today() + datetime.timedelta(days=days)
         mode = event['mode']
     except Exception as e:
@@ -80,3 +80,9 @@ def ec2_snap_exec(event, context):
     else:
         snapshots_by_instance(instance, delete_date.strftime('%Y-%m-%d'), mode)
     return
+
+
+params = {'instance_id': 'i-a44d9064', 'retention': '15', 'mode': 'hot'}
+print params
+ec2_snap_exec(params, '')
+
